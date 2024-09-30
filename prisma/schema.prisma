@@ -9,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -43,7 +43,9 @@ model Profile {
   id        String   @id @default(uuid())
   userId    String   @unique
   firstName  String  
-  lastName  String  
+  lastName  String
+  nationality  String
+  gender  Gender
   phone     String?  @unique
   bio       String?
   avatarId       String?
@@ -52,6 +54,12 @@ model Profile {
 
   user        User     @relation("UserProfile",fields: [userId], references: [id])
   @@index([userId])
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
 }
 
 model Site {
