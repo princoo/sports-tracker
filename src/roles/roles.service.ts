@@ -10,4 +10,11 @@ export class RolesService {
     });
     return result;
   }
+  async getUserRole(userId: string) {
+    const result = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    });
+    return result;
+  }
 }

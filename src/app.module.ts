@@ -7,6 +7,8 @@ import { BcryptService } from './utility/bcrypt/bcrypt.service';
 import { ConfigModule } from '@nestjs/config';
 import { RolesModule } from './roles/roles.module';
 import { PrismaModule } from './prismaClient/prisma.module';
+import { UsersModule } from './users/users.module';
+import { JwtModule } from './utility/jwt.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { PrismaModule } from './prismaClient/prisma.module';
     }),
     RolesModule,
     PrismaModule,
+    UsersModule,
+    JwtModule,
   ],
   controllers: [AppController],
   providers: [AppService, BcryptService],
