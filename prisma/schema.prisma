@@ -9,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgres"
   url      = env("DATABASE_URL")
 }
 
@@ -67,6 +67,8 @@ model Site {
   name      String   @unique
   province  String
   district  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt @default(now())
 
   player    Player[] @relation("PlayerSite")
   coaches   CoachOnCenter[]
