@@ -33,10 +33,12 @@ export class UsersService {
         password: false,
         roleId: true,
         profile: true,
+        role: { select: { roleName: true } },
       },
     });
     return user;
   }
+
   async changeUserRole(userId: string, roleId: string) {
     const result = await this.prisma.user.update({
       where: { id: userId },

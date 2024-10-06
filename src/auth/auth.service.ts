@@ -2,11 +2,11 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 // import { ConfigService } from '@nestjs/config';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PrismaService } from 'src/prismaClient/prisma.service';
-import { BcryptService } from 'src/utility/bcrypt/bcrypt.service';
 import { RolesService } from 'src/roles/roles.service';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { BcryptService } from 'src/utility/bcrypt/bcrypt.service';
 
 @Injectable()
 export class AuthService {
@@ -62,6 +62,7 @@ export class AuthService {
   }
 
   async login(user: any) {
+    console.log('here');
     const payload = { username: user.userName, id: user.id };
     const secret = this.configService.get<string>('JWT_SECRET');
     return {

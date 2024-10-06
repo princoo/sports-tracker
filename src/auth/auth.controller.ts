@@ -4,8 +4,8 @@ import {
   Post,
   Req,
   UseGuards,
-  UsePipes,
-  ValidationPipe,
+  // UsePipes,
+  // ValidationPipe,
 } from '@nestjs/common';
 import { CreateUserDto, LoginDto } from './dto/create-user.dto';
 import { AuthService } from './auth.service';
@@ -16,18 +16,17 @@ import { LocalAuthGuard } from './guards/local.guard';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
   @Post('signup')
-  @UsePipes(new ValidationPipe())
+  // @UsePipes(new ValidationPipe())
   async signUp(@Body() createUserDto: CreateUserDto) {
     const data = await this.authService.register(createUserDto);
     return { message: 'Account registered successfull', data };
   }
 
-  @UseGuards(LocalAuthGuard)
   @Post('login')
-  @UsePipes(new ValidationPipe())
+  // @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+  @UseGuards(LocalAuthGuard)
   async login(@Body() loginDto: LoginDto, @Req() req: any) {
     const token = await this.authService.login(req.user);
     return { message: 'logged in successfully', data: token };
-    // console.log(req.user);
   }
 }

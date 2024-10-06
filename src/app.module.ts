@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -9,17 +9,20 @@ import { RolesModule } from './roles/roles.module';
 import { PrismaModule } from './prismaClient/prisma.module';
 import { UsersModule } from './users/users.module';
 import { JwtModule } from './utility/jwt.module';
+import { SiteModule } from './site/site.module';
 
+// @Global()
 @Module({
   imports: [
-    AuthModule,
     ConfigModule.forRoot({
       isGlobal: true, // this will make it global without need to import it in every module
     }),
+    AuthModule,
     RolesModule,
     PrismaModule,
     UsersModule,
     JwtModule,
+    SiteModule,
   ],
   controllers: [AppController],
   providers: [AppService, BcryptService],

@@ -9,7 +9,9 @@ import {
 } from '@nestjs/common';
 import { IsString } from 'class-validator';
 import { UsersService } from './users.service';
-import { JwtGuard } from 'src/core/guards/jwtguard/jwt_guard.guard';
+import { JwtGuard } from 'src/core/guards/jwt_guard.guard';
+import { RolesGuard } from 'src/core/guards/roles.guard';
+import { UserRoleEnum } from 'src/core/enums/roles.enum';
 
 class UserRole {
   @IsString()
@@ -20,11 +22,11 @@ class UserRole {
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Patch('role/:userId') // change user role
-  @UseGuards(JwtGuard)
+  @Patch('role/:userId')
+  @UseGuards(JwtGuard, new RolesGuard([UserRoleEnum.HSO]))
   @UsePipes(new ValidationPipe())
-  async changeUserRole(@Body() { roleId }: UserRole, @Param() userId: string) {
-    const data = await this.usersService.changeUserRole(userId, roleId);
+  async changeUserRole(@Body() { roleId }: UserRole, @Param() params: any) {
+    const data = await this.usersService.changeUserRole(params.userId, roleId);
     return { message: 'User role changed successfully', data };
   }
 }
