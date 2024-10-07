@@ -12,6 +12,7 @@ import { CheckSiteIdExistsMiddleware } from 'src/core/middlewares/site/CheckSite
   imports: [RolesModule, UsersModule],
   controllers: [SiteController],
   providers: [SiteService, AuthService, BcryptService],
+  exports: [SiteService],
 })
 export class SiteModule {
   configure(consumer: MiddlewareConsumer) {
@@ -19,11 +20,11 @@ export class SiteModule {
       .apply(CheckSiteExistsMiddleware)
       .forRoutes(
         { path: 'site', method: RequestMethod.POST },
-        { path: 'site/:id', method: RequestMethod.PATCH },
+        { path: 'site/:siteId', method: RequestMethod.PATCH },
       );
 
     consumer
       .apply(CheckSiteIdExistsMiddleware)
-      .forRoutes({ path: 'site/:id', method: RequestMethod.DELETE });
+      .forRoutes({ path: 'site/:siteId', method: RequestMethod.DELETE });
   }
 }

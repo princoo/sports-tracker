@@ -30,7 +30,7 @@ import { BcryptService } from 'src/utility/bcrypt/bcrypt.service';
     LocalStrategy,
   ],
   controllers: [AuthController],
-  // exports: [AuthService],
+  exports: [AuthService],
 })
 export class AuthModule {
   configure(consumer: MiddlewareConsumer) {

@@ -17,7 +17,6 @@ export class CheckSiteExistsMiddleware implements NestMiddleware {
       if (site) {
         throw new BadRequestException(`Site with name ${name} already exists.`);
       }
-      next();
     }
     next();
   }

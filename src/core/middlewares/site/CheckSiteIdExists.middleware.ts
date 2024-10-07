@@ -11,7 +11,10 @@ export class CheckSiteIdExistsMiddleware implements NestMiddleware {
   constructor(private siteService: SiteService) {}
 
   async use(req: Request, res: Response, next: NextFunction) {
-    const { id } = req.params;
+    const id = req.params.siteId || req.body.siteId;
+    if (!id) {
+      throw new BadRequestException(`ID for site is required`);
+    }
     const site = await this.siteService.findById(id);
     if (!site) {
       throw new BadRequestException(`Site with this ID does not exists.`);
