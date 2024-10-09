@@ -5,6 +5,7 @@ import {
   MaxLength,
   Matches,
   IsEnum,
+  IsOptional,
 } from 'class-validator';
 
 export enum Gender {
@@ -32,6 +33,7 @@ export class CreateUserDto {
   @IsEnum(Gender)
   gender: Gender;
 
+  @IsOptional()
   @IsString()
   roleId: string;
 

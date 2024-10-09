@@ -52,7 +52,7 @@ model Profile {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt @default(now())
 
-  user        User     @relation("UserProfile",fields: [userId], references: [id])
+  user        User     @relation("UserProfile",fields: [userId], references: [id], onDelete: Cascade)
   @@index([userId])
 }
 
@@ -78,6 +78,7 @@ model Player {
   id        String   @id @default(uuid())
   firstName  String  
   lastName  String
+  age     Float
   height  Float
   weight  Float
   foot  String
@@ -85,9 +86,10 @@ model Player {
   acadStatus  String
   dob       DateTime
   gender       String
+  positions    String[]
   siteId        String
 
-  site    Site  @relation("PlayerSite",fields:[siteId],references:[id])
+  site    Site  @relation("PlayerSite",fields:[siteId],references:[id], onDelete: Cascade)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt @default(now())
   @@index([siteId])
@@ -97,8 +99,10 @@ model CoachOnCenter {
   id       String      @id @default(uuid())
   userId   String
   siteId   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt @default(now())
 
-  user     User     @relation(fields: [userId], references: [id])
-  center   Site     @relation(fields: [siteId], references: [id])
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  center   Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
   @@unique([userId]) // ensure a coach can only belong to one center
 }

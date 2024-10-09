@@ -45,21 +45,24 @@ export class SiteController {
     return { message: 'All sites retrieved', data };
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
-    const data = await this.siteService.findById(id);
+  @Get(':siteId')
+  async findOne(@Param('siteId') siteId: string) {
+    const data = await this.siteService.findById(siteId);
     return { message: 'site retrieved', data };
   }
 
-  @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateSiteDto: UpdateSiteDto) {
-    const data = await this.siteService.update(id, updateSiteDto);
+  @Patch(':siteId')
+  async update(
+    @Param('siteId') siteId: string,
+    @Body() updateSiteDto: UpdateSiteDto,
+  ) {
+    const data = await this.siteService.update(siteId, updateSiteDto);
     return { message: 'site updated', data };
   }
 
-  @Delete(':id')
-  async remove(@Param('id') id: string) {
-    const data = await this.siteService.remove(id);
+  @Delete(':siteId')
+  async remove(@Param('siteId') siteId: string) {
+    const data = await this.siteService.remove(siteId);
     return { message: 'site deleted', data };
   }
 }

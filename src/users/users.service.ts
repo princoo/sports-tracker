@@ -33,6 +33,7 @@ export class UsersService {
         password: false,
         roleId: true,
         profile: true,
+        status: true,
         role: { select: { roleName: true } },
       },
     });
