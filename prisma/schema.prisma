@@ -26,6 +26,7 @@ model User {
   role      Role     @relation("UserRole",fields:[roleId], references: [id])
   profile   Profile?  @relation("UserProfile")
   Coach    CoachOnCenter? // Single relation field for one coach in one center
+  testsRecorded  PlayerTest[] @relation("testsRecorded")
   @@index([roleId])
 }
 
@@ -92,6 +93,9 @@ model Player {
   site    Site  @relation("PlayerSite",fields:[siteId],references:[id], onDelete: Cascade)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt @default(now())
+
+  testRecords   PlayerTest[]  @relation("testRecords")
+
   @@index([siteId])
 }
 
@@ -105,4 +109,93 @@ model CoachOnCenter {
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   center   Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
   @@unique([userId]) // ensure a coach can only belong to one center
+}
+
+model Test {
+  id       String      @id @default(uuid())
+  name   String @unique
+  description   String
+  requiredMetrics String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt @default(now())
+
+  testResults PlayerTest[] @relation("testResults")
+  sessions    SessionTests[] @relation("tests")
+
+}
+
+model TestSession {
+  id     String      @id @default(uuid())
+  date   DateTime
+  isActive Boolean
+  status   SessionStatus
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt @default(now())
+
+  tests       SessionTests[] @relation("testSessions")
+  testResults PlayerTest[] @relation("sessionResults")
+}
+enum SessionStatus {
+  SCHEDULED
+  ACTIVE
+  COMPLETED
+}
+
+model SessionTests {
+  id     String      @id @default(uuid())
+  sessionId   String
+  testId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt @default(now())
+
+  session     TestSession   @relation("testSessions",fields: [sessionId], references: [id], onDelete: Cascade)
+  test        Test   @relation("tests",fields: [testId], references: [id], onDelete: Cascade)
+}
+
+model PlayerTest {
+  id          String   @id @default(uuid())
+  playerId    String
+  testId      String
+  sessionId   String
+  metricsId   String
+  recorderBy  String
+  recordedAt  DateTime
+  results     Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt @default(now())
+
+  player      Player   @relation("testRecords",fields: [playerId], references: [id], onDelete: Cascade)
+  test        Test     @relation("testResults",fields: [testId], references: [id], onDelete: Cascade)
+  user        User     @relation("testsRecorded",fields: [recorderBy], references: [id])
+  testSession TestSession     @relation("sessionResults",fields: [sessionId], references: [id])
+  metrics     TestMetrics[] @relation("playerTestMetrics")
+
+  @@index([playerId, testId])
+}
+
+enum Foot {
+  LEFT
+  RIGHT
+  BOTH
+}
+
+model TestMetrics {
+  id       String      @id @default(uuid())
+  playerTestId   String
+  accuracy Float?
+  bodyPosition  Float?
+  totalTime     Float?
+  Attempts      Int?
+  successes     Int?
+  power         Float?
+  conesTouched  Int?
+  foot      Foot?
+  errors        Int?
+  distance      Float?
+  ballControll Float?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt @default(now())
+
+  playerTest        PlayerTest     @relation("playerTestMetrics",fields: [playerTestId], references: [id], onDelete: Cascade)
+  @@index([playerTestId])
 }
