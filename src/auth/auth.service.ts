@@ -57,13 +57,12 @@ export class AuthService {
       throw new UnauthorizedException('Incorrect password');
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...result } = user;
+    const { password, createdAt, updatedAt, ...result } = user;
     return result;
   }
 
   async login(user: any) {
-    console.log('here');
-    const payload = { username: user.userName, id: user.id };
+    const payload = user;
     const secret = this.configService.get<string>('JWT_SECRET');
     return {
       access_token: await this.jwtService.signAsync(payload, { secret }),

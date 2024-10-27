@@ -43,6 +43,7 @@ export class CreatePlayerDto {
 
   @IsString()
   @IsNotEmpty()
+  @IsEnum(FootEnum, { each: true })
   foot: FootEnum;
 
   @IsString()

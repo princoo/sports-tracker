@@ -10,6 +10,7 @@ export class UsersService {
       where: {
         OR: [{ email: input }, { userName: input }],
       },
+      include: { role: { select: { roleName: true } } },
     });
     return user;
   }
@@ -44,6 +45,13 @@ export class UsersService {
     const result = await this.prisma.user.update({
       where: { id: userId },
       data: { roleId },
+    });
+    return result;
+  }
+  async getAllUsers(ExceptId: string) {
+    const result = await this.prisma.user.findMany({
+      where: { id: { not: ExceptId } },
+      include: { role: true, profile: true },
     });
     return result;
   }

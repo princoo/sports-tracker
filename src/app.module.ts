@@ -1,8 +1,8 @@
-import { Global, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-// import { PrismaService } from './prismaClient/prisma.service';
 import { BcryptService } from './utility/bcrypt/bcrypt.service';
 import { ConfigModule } from '@nestjs/config';
 import { RolesModule } from './roles/roles.module';
@@ -12,12 +12,15 @@ import { JwtModule } from './utility/jwt.module';
 import { SiteModule } from './site/site.module';
 import { CoachOnSiteModule } from './coach-on-site/coach-on-site.module';
 import { PlayersModule } from './players/players.module';
+import { TestModule } from './test/test.module';
+import { TestSessionModule } from './test-session/test-session.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true, // this will make it global without need to import it in every module
     }),
+    ScheduleModule.forRoot(),
     AuthModule,
     RolesModule,
     PrismaModule,
@@ -26,6 +29,8 @@ import { PlayersModule } from './players/players.module';
     SiteModule,
     CoachOnSiteModule,
     PlayersModule,
+    TestModule,
+    TestSessionModule,
   ],
   controllers: [AppController],
   providers: [AppService, BcryptService],

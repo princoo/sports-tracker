@@ -24,7 +24,13 @@ export class PlayersController {
   constructor(private readonly playersService: PlayersService) {}
 
   @Post(':siteId')
-  @UseGuards(new RolesGuard([UserRoleEnum.TECHNICIAN, UserRoleEnum.COACH]))
+  @UseGuards(
+    new RolesGuard([
+      UserRoleEnum.HSO,
+      UserRoleEnum.TECHNICIAN,
+      UserRoleEnum.COACH,
+    ]),
+  )
   @UseInterceptors(CheckCoachAssignedToSite)
   async create(
     @Body() createPlayerDto: CreatePlayerDto,
@@ -55,7 +61,13 @@ export class PlayersController {
   }
 
   @Patch(':playerId')
-  @UseGuards(new RolesGuard([UserRoleEnum.TECHNICIAN, UserRoleEnum.COACH]))
+  @UseGuards(
+    new RolesGuard([
+      UserRoleEnum.HSO,
+      UserRoleEnum.TECHNICIAN,
+      UserRoleEnum.COACH,
+    ]),
+  )
   @UseInterceptors(CheckPlayerCoach)
   async update(
     @Param('playerId') playerId: string,
@@ -66,7 +78,13 @@ export class PlayersController {
   }
 
   @Delete(':playerId')
-  @UseGuards(new RolesGuard([UserRoleEnum.TECHNICIAN, UserRoleEnum.COACH]))
+  @UseGuards(
+    new RolesGuard([
+      UserRoleEnum.HSO,
+      UserRoleEnum.TECHNICIAN,
+      UserRoleEnum.COACH,
+    ]),
+  )
   @UseInterceptors(CheckPlayerCoach)
   async remove(@Param('playerId') playerId: string) {
     const data = await this.playersService.remove(playerId);

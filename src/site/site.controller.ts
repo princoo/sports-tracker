@@ -45,6 +45,12 @@ export class SiteController {
     return { message: 'All sites retrieved', data };
   }
 
+  @Get('free-coach')
+  async findCoachesWithOnSite() {
+    const data = await this.siteService.findCoachesWithNoSite();
+    return { message: 'Coaches with no site retrieved', data };
+  }
+
   @Get(':siteId')
   async findOne(@Param('siteId') siteId: string) {
     const data = await this.siteService.findById(siteId);
