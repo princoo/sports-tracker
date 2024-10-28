@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "PlayerTest" ALTER COLUMN "recordedAt" SET DEFAULT CURRENT_TIMESTAMP;

@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { TestSession } from '@prisma/client';
+import * as moment from 'moment';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { CreateTestSessionDto } from './dto/create-test-session.dto';
 import { UpdateTestSessionDto } from './dto/update-test-session.dto';
@@ -16,9 +17,12 @@ export class TestSessionService {
 
   async create(createTestSessionDto: CreateTestSessionDto) {
     const { tests, date } = createTestSessionDto;
-    const currentDate = new Date().toISOString();
-    const sessionDate = new Date(date).toISOString();
-
+    const currentDate = moment().local().format('YYYY-MM-DDTHH:mm:ss[Z]');
+    // const currentDate = new Date().toISOString();
+    const sessionDate = moment(date).utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
+    console.log(date);
+    console.log(sessionDate);
+    // const sessionDate = new Date(date).toISOString();
     // Check if the provided test IDs exist
     const existingTests = await this.prisma.test.findMany({
       where: {
@@ -37,6 +41,7 @@ export class TestSessionService {
       );
     }
     // Check if the date is in the past
+    // if (sessionDate < currentDate) {
     if (sessionDate.split('T')[0] < currentDate.split('T')[0]) {
       throw new BadRequestException(
         'The session date must be today or in the future.',
@@ -45,6 +50,7 @@ export class TestSessionService {
     let isActive = false;
     let status = SessionStatus.SCHEDULED;
     if (sessionDate.split('T')[0] === currentDate.split('T')[0]) {
+      // if (sessionDate === currentDate) {
       isActive = true;
       status = SessionStatus.ACTIVE;
     }
@@ -69,7 +75,17 @@ export class TestSessionService {
   }
 
   findAll() {
-    return this.prisma.testSession.findMany({ include: { tests: true } });
+    return this.prisma.testSession.findMany({
+      include: { tests: true },
+      orderBy: [
+        {
+          isActive: 'desc', // Sort by isActive, with 'true' values first
+        },
+        {
+          date: 'desc', // Sort by date (use 'asc' for ascending order)
+        },
+      ],
+    });
   }
 
   findOne(id: string) {
@@ -78,26 +94,38 @@ export class TestSessionService {
       include: { tests: true },
     });
   }
+  findActiveSessions() {
+    return this.prisma.testSession.findFirst({
+      where: {
+        isActive: true,
+        status: SessionStatus.ACTIVE,
+      },
+      include: {
+        tests: { include: { test: true } },
+      },
+    });
+  }
+
   findActive(date: string) {
     return this.prisma.testSession.findMany({
       where: {
         isActive: true,
         status: SessionStatus.ACTIVE,
-        date: new Date(date),
+        date: moment(date).utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
       },
     });
   }
   findOnSameDay(date: string) {
     return this.prisma.testSession.findMany({
-      where: { date: new Date(date).toISOString() },
+      where: { date: moment(date).utc().format('YYYY-MM-DDTHH:mm:ss[Z]') },
     });
   }
 
   async update(id: string, updateTestSessionDto: UpdateTestSessionDto) {
     const { tests, date } = updateTestSessionDto;
     let existingTests: { id: string }[] = [];
-    const isActive = false;
-    const status = SessionStatus.SCHEDULED;
+    let isActive = false;
+    let status = SessionStatus.SCHEDULED;
 
     if (tests && tests.length > 0) {
       existingTests = await this.prisma.test.findMany({
@@ -118,12 +146,14 @@ export class TestSessionService {
       }
     }
 
-    const currentDate = new Date().toISOString();
+    // const currentDate = new Date().toISOString();
+    const currentDate = moment().utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
     return this.prisma.$transaction(async (tx) => {
       // Handle updates to the TestSession
       const updateData: Partial<TestSession> = {};
       if (date) {
-        const sessionDate = new Date(date).toISOString();
+        // const sessionDate = new Date(date).toISOString();
+        const sessionDate = moment(date).utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
         if (sessionDate.split('T')[0] < currentDate.split('T')[0]) {
           throw new BadRequestException(
             'The session date must be today or in the future.',
@@ -139,12 +169,16 @@ export class TestSessionService {
         if (sessionDateExists) {
           throw new BadRequestException('The session date already exists.');
         }
-        updateData.date = sessionDate as unknown as Date; // Include the new date
+        if (sessionDate.split('T')[0] == currentDate.split('T')[0]) {
+          // Update the TestSession
+          isActive = true;
+          status = SessionStatus.ACTIVE;
+        }
+        updateData.isActive = isActive;
+        updateData.status = status;
+        updateData.date = sessionDate as any; // Include the new date
+        console.log(updateData);
       }
-
-      // Update the TestSession
-      updateData.isActive = isActive;
-      updateData.status = status;
 
       const updatedSession = await tx.testSession.update({
         where: { id },
@@ -179,17 +213,24 @@ export class TestSessionService {
     return this.prisma.testSession.delete({ where: { id } });
   }
 
+  // @Cron(CronExpression.EVERY_10_SECONDS)
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async handleSessionExpiration() {
-    const currentDate = new Date();
-    const dateOnly = currentDate.toISOString().split('T')[0];
-    const dateWithIsoTime = new Date(dateOnly);
+    const currentDate = moment().utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
+    const dateOnly = currentDate.split('T')[0];
+    const dateWithIsoTime = moment(dateOnly)
+      .utc()
+      .format('YYYY-MM-DDTHH:mm:ss[Z]');
+    console.log(dateWithIsoTime);
+    console.log(dateOnly);
+    // const dateWithIsoTime = new Date(dateOnly);
     const deactivatedResults = await this.prisma.testSession.updateMany({
       where: {
         isActive: true,
         status: SessionStatus.ACTIVE,
         date: {
-          lt: dateWithIsoTime.toISOString(),
+          lt: dateWithIsoTime,
+          // lt: dateWithIsoTime.toISOString(),
         },
       },
       data: {
@@ -202,7 +243,8 @@ export class TestSessionService {
         isActive: false,
         status: SessionStatus.SCHEDULED,
         date: {
-          equals: dateWithIsoTime.toISOString(),
+          equals: dateWithIsoTime,
+          // equals: dateWithIsoTime.toISOString(),
         },
       },
       data: {

@@ -27,6 +27,12 @@ export class TestSessionController {
     return { message: 'Session created successfully', data };
   }
 
+  @Get('session/active')
+  async findActive() {
+    const data = await this.testSessionService.findActiveSessions();
+    return { message: 'Active Session retrieved successfully', data };
+  }
+
   @Get()
   async findAll() {
     const data = await this.testSessionService.findAll();
@@ -35,10 +41,10 @@ export class TestSessionController {
 
   @Get(':sessionId')
   async findOne(@Param('sessionId') sessionId: string) {
+    console.log(sessionId);
     const data = await this.testSessionService.findOne(sessionId);
     return { message: 'Session retrieved successfully', data };
   }
-
   @Patch(':sessionId')
   @UseGuards(new RolesGuard([UserRoleEnum.HSO, UserRoleEnum.ADMIN]))
   async update(
