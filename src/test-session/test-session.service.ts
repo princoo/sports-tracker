@@ -78,6 +78,15 @@ export class TestSessionService {
       include: { tests: true },
     });
   }
+  findActiveSessions() {
+    return this.prisma.testSession.findFirst({
+      where: {
+        isActive: true,
+        status: SessionStatus.ACTIVE,
+      },
+    });
+  }
+
   findActive(date: string) {
     return this.prisma.testSession.findMany({
       where: {

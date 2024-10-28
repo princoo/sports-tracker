@@ -157,10 +157,9 @@ model PlayerTest {
   playerId    String
   testId      String
   sessionId   String
-  metricsId   String
   recorderBy  String
-  recordedAt  DateTime
-  results     Float
+  recordedAt  DateTime @default(now())
+  results     Float?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt @default(now())
 

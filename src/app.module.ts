@@ -14,6 +14,7 @@ import { CoachOnSiteModule } from './coach-on-site/coach-on-site.module';
 import { PlayersModule } from './players/players.module';
 import { TestModule } from './test/test.module';
 import { TestSessionModule } from './test-session/test-session.module';
+import { PlayerTestModule } from './player-test/player-test.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { TestSessionModule } from './test-session/test-session.module';
     PlayersModule,
     TestModule,
     TestSessionModule,
+    PlayerTestModule,
   ],
   controllers: [AppController],
   providers: [AppService, BcryptService],
