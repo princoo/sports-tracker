@@ -157,17 +157,16 @@ model PlayerTest {
   playerId    String
   testId      String
   sessionId   String
-  metricsId   String
   recorderBy  String
-  recordedAt  DateTime
-  results     Float
+  recordedAt  DateTime @default(now())
+  results     Float?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt @default(now())
 
   player      Player   @relation("testRecords",fields: [playerId], references: [id], onDelete: Cascade)
   test        Test     @relation("testResults",fields: [testId], references: [id], onDelete: Cascade)
   user        User     @relation("testsRecorded",fields: [recorderBy], references: [id])
-  testSession TestSession     @relation("sessionResults",fields: [sessionId], references: [id])
+  testSession TestSession     @relation("sessionResults",fields: [sessionId], references: [id], onDelete: Cascade)
   metrics     TestMetrics[] @relation("playerTestMetrics")
 
   @@index([playerId, testId])
